@@ -8,7 +8,7 @@ public class Main {
 
         try {
             // Conexión a la base de datos
-            connection = DriverManager.getConnection("http://10.42.0.1:8080/your_database", "your_username", "your_password");
+            connection = DriverManager.getConnection("jdbc:mariadb://192.168.4.1:3306/dbreto", "admin", "admin");
             System.out.println("Conexión exitosa a la base de datos.");
 
             boolean salir = true;
