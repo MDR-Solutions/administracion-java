@@ -1,5 +1,4 @@
 import java.sql.*;
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -8,7 +7,7 @@ public class Main {
 
         try {
             // Conexión a la base de datos
-            connection = DriverManager.getConnection("http://10.42.0.1:8080/your_database", "your_username", "your_password");
+            connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/dbreto", "admin", "admin");
             System.out.println("Conexión exitosa a la base de datos.");
 
             boolean salir = true;
@@ -19,14 +18,13 @@ public class Main {
                 System.out.println("3. Salir");
                 System.out.print("Elige una opción: ");
                 int opcion = Io.leerNumero();
-                scanner.nextLine();
 
                 if (opcion == 1) {
                     // Login
                     System.out.print("Introduce tu DNI: ");
-                    String dni = scanner.nextLine();
+                    String dni = Io.leerTexto();
                     System.out.print("Introduce tu contraseña: ");
-                    String contrasena = scanner.nextLine();
+                    String contrasena = Io.leerTexto();
 
                     String query = "SELECT * FROM TUSUARIOS WHERE USUDNI = ? AND USUCONTRASENA = ?";
                     try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -48,7 +46,6 @@ public class Main {
                                 System.out.println("0. Cerrar sesión");
                                 System.out.print("Elige una opción: ");
                                 int subOpcion = Io.leerNumero();
-                                scanner.nextLine();
 
                                 if (subOpcion == 0) {
                                     System.out.println("Cerrando sesión...");
@@ -68,7 +65,7 @@ public class Main {
                                     Io.menuEjemplar(connection);
                                 } else if (subOpcion == 5) {
                                     System.out.println("Accediendo a Autores...");
-                                    Io.menuAutor(connection);
+                                    Autor.menuAutor(connection);
                                 }
                             }
                         } else {
@@ -79,7 +76,7 @@ public class Main {
                     }
                 } else if (opcion == 2) {
                     // Registrarse
-                    Io.registrarUsuarioNormal(connection);
+                    Usuario.registrarUsuarioNormal(connection);
                 } else if (opcion == 3) {
                     System.out.println("Saliendo del programa...");
                     salir = false;
@@ -89,10 +86,13 @@ public class Main {
                 }
             }
         } catch (SQLException e) {
-           System.out.println("Error al conectar con la base de datos: " + e.getMessage());
-        }         finally {
+            System.out.println("Error al conectar con la base de datos: " + e.getMessage());
+        } finally {
+            // Cerramos la conexión a la base de datos
             Io.cerrarConexion(connection);
-            scanner.close();
+            
+            // Cerramos el Scanner global antes de terminar la aplicación
+            Io.cerrarScanner();
         }
     }
 }
