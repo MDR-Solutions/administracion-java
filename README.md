@@ -4,8 +4,6 @@
 
 Este proyecto es un sistema de gestión para bibliotecas que permite administrar usuarios, libros, préstamos y más. Facilita el control de inventario de libros, el seguimiento de préstamos y la gestión de usuarios.
 
-Los usuarios no administradores pueden consultar el catalogo pero no podran gentionar sus prestamos
-
 ## Características principales
 
 - **Gestión de usuarios**: Registro, modificación y eliminación de usuarios
@@ -58,6 +56,12 @@ Una vez iniciada sesión, tendrá acceso a las siguientes opciones:
 - Consultar préstamos activos
 - Gestionar devoluciones
 
+## Administración de Usuarios
+
+- Ver listado de usuarios
+- Añadir o elimiar usuarios
+- Buscar usuarios penalizados
+- 
 ## Notas importantes
 
 - La fecha de devolución se calcula automáticamente (15 días a partir del préstamo)
