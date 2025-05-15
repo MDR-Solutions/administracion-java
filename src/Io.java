@@ -24,6 +24,19 @@ public class Io {
         }
     }
 
+    public static boolean leerSiNo() {
+        String respuesta;
+        do {
+            respuesta = scanner.nextLine().toLowerCase();
+        } while (!respuesta.equals("s") && !respuesta.equals("n") && !respuesta.equals("si") && !respuesta.equals("no"));
+        
+        if (respuesta.equals("s") || respuesta.equals("si")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static int leerNumero() {
         while (true) {
             try {
