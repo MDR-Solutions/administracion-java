@@ -1,5 +1,7 @@
-import java.sql.*;
-import java.util.Scanner;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Libro {
     //Atributos
@@ -59,7 +61,6 @@ public class Libro {
 
     // Menu de libro
     public static void menuLibro(Connection conn) {
-        Scanner input = new Scanner(System.in);
         int opcion = 0;
 
         do {
@@ -75,7 +76,7 @@ public class Libro {
             switch (opcion) {
                 case 1:
                     try {
-                        ejecutarSelectLibro(conn);
+                        selectLibro(conn);
                     } catch (SQLException e) {
                         System.out.println("Error al mostrar libros: " + e.getMessage());
                     }
@@ -89,10 +90,9 @@ public class Libro {
                     break;
                 case 3:
                     System.out.println("Introduce el ID del libro a eliminar: ");
-                    int id_libro = Io.leerNumero();
-                    Libro libroAEliminar = new Libro(id_libro, 0, null);
+                    int id = Io.leerNumero();
                     try {
-                        boolean eliminado = ejecutarDeleteLibro(conn, libroAEliminar);
+                        boolean eliminado = deleteLibro(conn, id);
                         if (eliminado) {
                             System.out.println("Libro eliminado correctamente.");
                         } else {
@@ -104,9 +104,9 @@ public class Libro {
                     break;
                 case 4:
                     System.out.println("Introduce el ISBN del libro a buscar: ");
-                    String isbn = input.next();
+                    long isbn = Io.leerLong();
                     try {
-                        BuscarLibro(conn, isbn);
+                        buscarLibro(conn, isbn);
                     } catch (SQLException e) {
                         System.out.println("Error al buscar libro: " + e.getMessage());
                     }
@@ -121,10 +121,10 @@ public class Libro {
     }
 
     // Funciones de Libro
-    public static int ejecutarInsertLibro(Connection conn, Libro obj) throws SQLException {
-        long isbn = obj.getIsbn();
-        int copias = obj.getCopias();
-        String titulo = obj.getTitulo();
+    public static int insertLibro(Connection conn, Libro libro) throws SQLException {
+        long isbn = libro.getIsbn();
+        int copias = libro.getCopias();
+        String titulo = libro.getTitulo();
 
         String str = "INSERT INTO TLIBROS (LIBISBN, LIBTITULO, LIBCOPIAS) VALUES ('" + isbn + "', '" + titulo + "', '" + copias + "')";
 
@@ -134,7 +134,7 @@ public class Libro {
         return numeroCambios;
     }
 
-    public static void ejecutarSelectLibro(Connection conn) throws SQLException {
+    public static void selectLibro(Connection conn) throws SQLException {
         String sql = "SELECT * FROM TLIBROS";
         Statement st = null;
         ResultSet rs = null;
@@ -144,37 +144,36 @@ public class Libro {
             rs = st.executeQuery(sql);
 
             while (rs.next()) {
+                int id = rs.getInt("LIBID");
                 long isbn = rs.getLong("LIBISBN");
                 String titulo = rs.getString("LIBTITULO");
                 int copias = rs.getInt("LIBCOPIAS");
 
                 System.out.println("------------------------------------------------------------------------------");
-                System.out.println("ID Libro: 0, ISBN: " + isbn + ", Titulo: " + titulo + ", Copias: " + copias);
+                System.out.println("ID Libro: " + id + ", ISBN: " + isbn + ", Titulo: " + titulo + ", Copias: " + copias);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public static boolean ejecutarDeleteLibro(Connection conn, Libro obj) throws SQLException {
-        int id_libro = obj.getId_libro();
-        String sql = "DELETE FROM TLIBROS WHERE LIBID = " + id_libro;
+    public static boolean deleteLibro(Connection conn, int id) throws SQLException {
+        String sql = "DELETE FROM TLIBROS WHERE LIBID = " + id;
 
         Statement stmt = conn.createStatement();
         return stmt.executeUpdate(sql) > 0;
     }
 
     public static Libro crearLibro(Connection conn) throws SQLException, InterruptedException {
-        Scanner input = new Scanner(System.in);
         System.out.println("Introduce el ISBN: ");
-        long isbn = Io.leerNumero();
+        long isbn = Io.leerLong();
         System.out.println("Introduce el titulo: ");
-        String titulo = input.next();
+        String titulo = Io.leerTexto();
         System.out.println("Introduce el numero de copias: ");
         int copias = Io.leerNumero();
 
         Libro nuevoLibro = new Libro(isbn, copias, titulo);
-        int cambios = ejecutarInsertLibro(conn, nuevoLibro);
+        int cambios = insertLibro(conn, nuevoLibro);
 
         if (cambios == 0) {
             System.out.println("No se ha podido añadir el registro");
@@ -184,7 +183,7 @@ public class Libro {
         return nuevoLibro;
     }
 
-    public static Libro BuscarLibro(Connection conn, long isbn) throws SQLException {
+    public static Libro buscarLibro(Connection conn, long isbn) throws SQLException {
         String sql = "SELECT * FROM TLIBROS WHERE LIBISBN = '" + isbn + "'";
         Statement st = null;
         ResultSet rs = null;
@@ -197,11 +196,12 @@ public class Libro {
             if (rs.next()) {
 				String swtitulo = rs.getString("LIBTITULO");
                 long swisbn = rs.getLong("LIBISBN");
-                int swcop = rs.getInt("LIBID");
+                int swcop = rs.getInt("LIBCOPIAS");
+                int swid = rs.getInt("LIBID");
 
                 libro = new Libro(swisbn, swcop, swtitulo);
                 System.out.println("------------------------------------------------------------------------------");
-                System.out.println("Titulo: " + swtitulo + ", ISBN: " + isbn + ", Copias: "  + swcop + " ID: " );
+                System.out.println("Titulo: " + swtitulo + ", ISBN: " + isbn + ", Copias: "  + swcop + " ID: " + swid);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
