@@ -1,17 +1,17 @@
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        Connection connection = null;
+        // Obtenemos la conexión a la BBDD
+        Connection conn = ConexionDB.getConexion();
 
-        try {
-            // Conexión a la base de datos
-            connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/dbreto", "admin", "admin");
-            System.out.println("Conexión exitosa a la base de datos.");
-
-            boolean salir = true;
-            while (salir) {
+        // Verificamos que tenemos conexión
+        if (conn != null) {
+            boolean activo = true;
+            while (activo) {
                 System.out.println("Menú:");
                 System.out.println("1. Login");
                 System.out.println("2. Registrarse");
@@ -27,16 +27,16 @@ public class Main {
                     String contrasena = Io.leerTexto();
 
                     String query = "SELECT * FROM TUSUARIOS WHERE USUDNI = ? AND USUCONTRASENA = ?";
-                    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                    try (PreparedStatement stmt = conn.prepareStatement(query)) {
                         stmt.setString(1, dni);
                         stmt.setString(2, contrasena);
                         ResultSet rs = stmt.executeQuery();
 
                         if (rs.next()) {
-                            System.out.println("Login exitoso. Bienvenido, " + rs.getString("USUNOMBRE") + "!");
+                            System.out.println("Login exitoso. Bienvenido, " + rs.getString("USUNOM") + "!");
 
-                            boolean cerrarSesion = true;
-                            while (cerrarSesion) {
+                            boolean sesion = true;
+                            while (sesion) {
                                 System.out.println("Menú de usuario:");
                                 System.out.println("1. Libros");
                                 System.out.println("2. Usuario");
@@ -49,23 +49,23 @@ public class Main {
 
                                 if (subOpcion == 0) {
                                     System.out.println("Cerrando sesión...");
-                                    cerrarSesion = false;
+                                    sesion = false;
                                     break;
                                 } else if (subOpcion == 1) {
                                     System.out.println("Accediendo a Libros...");
-                                    Io.menuLibro(connection);
+                                    Libro.menuLibro(conn);
                                 } else if (subOpcion == 2) {
                                     System.out.println("Accediendo a Usuarios...");
-                                    Io.menuUsuario(connection);
+                                    Usuario.menuUsuario(conn);
                                 } else if (subOpcion == 3) {
                                     System.out.println("Accediendo a Prestamos...");
-                                    Io.menuPrestamo(connection);
+                                    Prestamo.menuPrestamo(conn);
                                 } else if (subOpcion == 4) {
                                     System.out.println("Accediendo a Ejemplares...");
-                                    Io.menuEjemplar(connection);
+                                    Ejemplar.menuEjemplar(conn);
                                 } else if (subOpcion == 5) {
                                     System.out.println("Accediendo a Autores...");
-                                    Autor.menuAutor(connection);
+                                    Autor.menuAutor(conn);
                                 }
                             }
                         } else {
@@ -76,23 +76,20 @@ public class Main {
                     }
                 } else if (opcion == 2) {
                     // Registrarse
-                    Usuario.registrarUsuarioNormal(connection);
+                    Usuario.registrarUsuarioNormal(conn);
                 } else if (opcion == 3) {
                     System.out.println("Saliendo del programa...");
-                    salir = false;
+                    activo = false;
                     break;
                 } else {
                     System.out.println("Opción no válida. Inténtalo de nuevo.");
                 }
             }
-        } catch (SQLException e) {
-            System.out.println("Error al conectar con la base de datos: " + e.getMessage());
-        } finally {
-            // Cerramos la conexión a la base de datos
-            Io.cerrarConexion(connection);
             
             // Cerramos el Scanner global antes de terminar la aplicación
             Io.cerrarScanner();
+        } else {
+            System.out.println("No se pudo establecer conexión a la base de datos.");
         }
     }
 }
