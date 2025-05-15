@@ -10,7 +10,7 @@ public class ConexionDB {
     private Connection conexion;
     
     // Datos para conectar a la BD
-    private String url = "jdbc:mariadb://localhost:3306/dbreto";
+    private String url = "jdbc:mariadb://192.168.4.1:3306/dbreto";
     private String usuario = "admin";
     private String contrasena = "admin";
     
