@@ -1,28 +1,24 @@
+import java.time.LocalDate;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Connection;
+
 public class Prestamo {
 	//Atributos
-    private int id_prestamo;
     private String dni;
     private int id_ejemplar;
-    private java.time.LocalDate fecha_prestamo, fecha_devolucion;
+    private LocalDate fecha_prestamo, fecha_devolucion;
 
     // Constructor
-    public Prestamo(int id, String d, int ej, String fp, String fd) {
-        this.id_prestamo = id;
+    public Prestamo(String d, int ej) {
         this.dni = d;
         this.id_ejemplar = ej;
-        this.fecha_prestamo = java.time.LocalDate.parse(fp);
-        this.fecha_devolucion = java.time.LocalDate.parse(fd).plusDays(15);
+        this.fecha_prestamo = LocalDate.now();
+        this.fecha_devolucion = LocalDate.now().plusDays(15);
     }
 
     // Getters y Setters
-    public int getId_prestamo() {
-        return id_prestamo;
-    }
-
-    public void setId_prestamo(int id) {
-        this.id_prestamo = id;
-    }
-
     public String getDni() {
         return dni;
     }
@@ -39,31 +35,31 @@ public class Prestamo {
         this.id_ejemplar = id_ejemplar;
     }
 
-    public java.time.LocalDate getFecha_prestamo() {
+    public LocalDate getFecha_prestamo() {
         return fecha_prestamo;
     }
 
-    public void setFecha_prestamo(java.time.LocalDate fecha_prestamo) {
+    public void setFecha_prestamo(LocalDate fecha_prestamo) {
         this.fecha_prestamo = fecha_prestamo;
     }
 
-    public java.time.LocalDate getFecha_devolucion() {
+    public LocalDate getFecha_devolucion() {
         return fecha_devolucion;
     }
 
-    public void setFecha_devolucion(java.time.LocalDate fecha_devolucion) {
+    public void setFecha_devolucion(LocalDate fecha_devolucion) {
         this.fecha_devolucion = fecha_devolucion;
     }
 
     // Funciones de Prestamo
-    public static int ejecutarInsertPrestamo(Connection conn, Prestamo obj) throws SQLException {
-        int id_prestamo = obj.getId_prestamo();
-        String dni = obj.getDni();
-        int id_ejemplar = obj.getId_ejemplar();
-        java.time.LocalDate fecha_prestamo = obj.getFecha_prestamo();
-        java.time.LocalDate fecha_devolucion = obj.getFecha_devolucion();
+    public static int insertPrestamo(Connection conn, Prestamo prestamo) throws SQLException {
+        String dni = prestamo.getDni();
+        int id_ejemplar = prestamo.getId_ejemplar();
+        LocalDate fecha_prestamo = prestamo.getFecha_prestamo();
+        LocalDate fecha_devolucion = prestamo.getFecha_devolucion();
 
-        String str = "INSERT INTO TPRESTAMOS (PREID, PREUSUDNI, PREEJECOD, PREFECHAPRESTAMO, PREFECHADEVOLUCION) VALUES ('" + id_prestamo + "', '" + dni + "', '" + id_ejemplar + "', '" + fecha_prestamo + "', '" + fecha_devolucion + "')";
+        String str = "INSERT INTO TPRESTAMOS (PREUSUDNI, PREEJEID, PREFECHAPRESTAMO, PREFECHADEVOLUCION)";
+        str += " VALUES ('" + dni + "', '" + id_ejemplar + "', '" + fecha_prestamo + "', '" + fecha_devolucion + "')";
 
         Statement stmt = conn.createStatement();
         int numeroCambios = stmt.executeUpdate(str);
@@ -71,7 +67,7 @@ public class Prestamo {
         return numeroCambios;
     }
 
-    public static void ejecutarSelectPrestamo(Connection conn) throws SQLException {
+    public static void selectPrestamo(Connection conn) throws SQLException {
         String sql = "SELECT * FROM TPRESTAMOS";
         ResultSet rs = null;
         Statement st = null;
@@ -81,53 +77,48 @@ public class Prestamo {
             rs = st.executeQuery(sql);
 
             while (rs.next()) {
-                int id_prestamo = rs.getInt("PREID");
-                String dni = rs.getString("PREUSUDNI");
-                int id_ejemplar = rs.getInt("PREEJECOD");
-                java.time.LocalDate fecha_prestamo = rs.getObject("PREFECHAPRESTAMO", java.time.LocalDate.class);
-                java.time.LocalDate fecha_devolucion = rs.getObject("PREFECHADEVOLUCION", java.time.LocalDate.class);
+                int swId = rs.getInt("PREID");
+                String swDni = rs.getString("PREUSUDNI");
+                int swIdEje = rs.getInt("PREEJEID");
+                LocalDate swFechaPres = rs.getObject("PREFECHAPRESTAMO", LocalDate.class);
+                LocalDate swFechaDev = rs.getObject("PREFECHADEVOLUCION",LocalDate.class);
+                String swDev = (rs.getInt("PREDEVUELTO") == 0 ? "No" : "Si");
+                LocalDate swFechaEnt = rs.getObject("PREFECHADEVOLUCIONREAL",LocalDate.class);
+
 
                 System.out.println("------------------------------------------------------------------------------");
-                System.out.println("ID Prestamo: " + id_prestamo + ", DNI: " + dni + ", ID Ejemplar: " + id_ejemplar + ", Fecha Prestamo: " + fecha_prestamo + ", Fecha Devolucion: " + fecha_devolucion);
+                System.out.println("ID Prestamo: " + swId + " , DNI: " + swDni + ", ID Ejemplar: " + swIdEje + ", Fecha Prestamo: " + swFechaPres + ", Fecha Devolución: " + swFechaDev + ", Devuelto: " + swDev + ", Fecha Entrega: " + swFechaEnt);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public static boolean ejecutarDeletePrestamo(Connection conn, Prestamo obj) throws SQLException {
-        int id_prestamo = obj.getId_prestamo();
-        String sql = "DELETE FROM TPRESTAMOS WHERE PREID = '" + id_prestamo + "'";
+    public static boolean deletePrestamo(Connection conn, int id) throws SQLException {
+        String sql = "DELETE FROM TPRESTAMOS WHERE PREID = '" + id + "'";
 
         Statement stmt = conn.createStatement();
         return stmt.executeUpdate(sql) > 0;
     }
 
     public static Prestamo crearPrestamo(Connection conn) throws SQLException, InterruptedException {
-        Scanner input = new Scanner(System.in);
-        System.out.println("Introduce el ID del prestamo: ");
-        int id_prestamo = Io.leerNumero();
         System.out.println("Introduce el DNI: ");
-        String dni = input.next();
+        String dni = Io.leerTexto();
         System.out.println("Introduce el ID del ejemplar: ");
         int id_ejemplar = Io.leerNumero();
 
-        java.time.LocalDate fechaPrestamo = java.time.LocalDate.parse(Io.leerFecha());
-        java.time.LocalDate fechaDevolucion = fechaPrestamo.plusDays(15);
-
-        Prestamo nuevoPrestamo = new Prestamo(id_prestamo, dni, id_ejemplar, fechaPrestamo.toString(), fechaDevolucion.toString());
-        int cambios = ejecutarInsertPrestamo(conn, nuevoPrestamo);
+        Prestamo nuevoPrestamo = new Prestamo(dni, id_ejemplar);
+        int cambios = insertPrestamo(conn, nuevoPrestamo);
 
         if (cambios == 0) {
             System.out.println("No se ha podido añadir el registro");
         } else {
             System.out.println("Registro añadido correctamente");
         }
-        input.close();
         return nuevoPrestamo;
     }
 
-    public static Prestamo BuscarPrestamo(Connection conn, int id_prestamo) throws SQLException {
+    public static Prestamo buscarPrestamo(Connection conn, int id_prestamo) throws SQLException {
         String sql = "SELECT * FROM TPRESTAMOS WHERE PREID = '" + id_prestamo + "'";
         Statement st = null;
         ResultSet rs = null;
@@ -137,17 +128,70 @@ public class Prestamo {
             rs = st.executeQuery(sql);
 
             if (rs.next()) {
-                int swid_prestamo = rs.getInt("PREID");
-                String swdni = rs.getString("PREUSUDNI");
+                int swId = rs.getInt("PREID");
+                String swDni = rs.getString("PREUSUDNI");
+                int swIdEje = rs.getInt("PREEJEID");
+                LocalDate swFechaPres = rs.getObject("PREFECHAPRESTAMO", LocalDate.class);
+                LocalDate swFechaDev = rs.getObject("PREFECHADEVOLUCION",LocalDate.class);
+                String swDev = (rs.getInt("PREDEVUELTO") == 0 ? "No" : "Si");
+                LocalDate swFechaEnt = rs.getObject("PREFECHADEVOLUCIONREAL",LocalDate.class);
 
-                Prestamo libro = new Prestamo(swid_prestamo, swdni, 0, "", "");
                 System.out.println("------------------------------------------------------------------------------");
-                System.out.println("ID Libro: 0, DNI: " + swdni + ", ID Ejemplar: " + swid_prestamo);
+                System.out.println("ID Prestamo: " + swId + " , DNI: " + swDni + ", ID Ejemplar: " + swIdEje + ", Fecha Prestamo: " + swFechaPres + ", Fecha Devolución: " + swFechaDev + ", Devuelto: " + swDev + ", Fecha Entrega: " + swFechaEnt);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
         return null; // No devuelve el libro
+    }
+    public static void menuPrestamo(Connection conn) {
+        int opcion = 0;
+
+        do {
+            System.out.println("Menu de prestamo:");
+            System.out.println("1. Ver lista de prestamos");
+            System.out.println("2. Añadir un prestamo");
+            System.out.println("3. Eliminar un prestamo");
+            System.out.println("4. Salir");
+            System.out.print("Selecciona una opción: ");
+            opcion = Io.leerNumero();
+
+            switch (opcion) {
+                case 1:
+                    try {
+                        selectPrestamo(conn);
+                    } catch (SQLException e) {
+                        System.out.println("Error al consultar la lista de préstamos: " + e.getMessage());
+                    }
+                    break;
+                case 2:
+                    try {
+                        crearPrestamo(conn);
+                    } catch (SQLException | InterruptedException e) {
+                        System.out.println("Error al crear el préstamo: " + e.getMessage());
+                    }
+                    break;
+                case 3:
+                    System.out.println("Introduce el ID del prestamo a eliminar: ");
+                    int id_prestamo = Io.leerNumero();
+                    try {
+                        boolean eliminado = deletePrestamo(conn, id_prestamo);
+                        if (eliminado) {
+                            System.out.println("Prestamo eliminado correctamente.");
+                        } else {
+                            System.out.println("No se pudo eliminar el prestamo.");
+                        }
+                    } catch (SQLException e) {
+                        System.out.println("Error al eliminar el préstamo: " + e.getMessage());
+                    }
+                    break;
+                case 4:
+                    System.out.println("Saliendo del menú de prestamo...");
+                    break;
+                default:
+                    System.out.println("Opción no válida. Inténtalo de nuevo.");
+            }
+        } while (opcion != 4);
     }
 }
