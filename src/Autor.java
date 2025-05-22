@@ -101,37 +101,37 @@ public class Autor {
     }
 
     public static void selectAutor(Connection conn) {
-    String sql = "SELECT * FROM TAUTORES";
-    ResultSet rs = null;
-    Statement st = null;
+        String sql = "SELECT * FROM TAUTORES";
+        ResultSet rs = null;
+        Statement st = null;
 
-    try {
-        st = conn.createStatement();
-        rs = st.executeQuery(sql);
+        try {
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
 
-        while (rs.next()) {
-            int id_autor = rs.getInt("AUTID");
-            String nombre = rs.getString("AUTNOM");
-            String apellido1 = rs.getString("AUTAPEL1");
-            String apellido2 = rs.getString("AUTAPEL2");
-            String nacionalidad = rs.getString("AUTNACIONALIDAD");
-            
-            // Formateo a LocalDate si se encuentra fecha
-            LocalDate fechaNacimiento = null;
-            java.sql.Date sqlDate = rs.getDate("AUTFECHANACIMIENTO");
-            if (sqlDate != null) {
-                fechaNacimiento = sqlDate.toLocalDate();
+            while (rs.next()) {
+                int id_autor = rs.getInt("AUTID");
+                String nombre = rs.getString("AUTNOM");
+                String apellido1 = rs.getString("AUTAPEL1");
+                String apellido2 = rs.getString("AUTAPEL2");
+                String nacionalidad = rs.getString("AUTNACIONALIDAD");
+                
+                // Formateo a LocalDate si se encuentra fecha
+                LocalDate fechaNacimiento = null;
+                java.sql.Date sqlDate = rs.getDate("AUTFECHANACIMIENTO");
+                if (sqlDate != null) {
+                    fechaNacimiento = sqlDate.toLocalDate();
+                }
+
+                System.out.println("------------------------------------------------------------------------------");
+                System.out.println("ID Autor: " + id_autor + ", Nombre: " + nombre + ", Apellido 1: " + apellido1 + 
+                                    ", Apellido 2: " + apellido2 + ", Nacionalidad: " + nacionalidad + 
+                                    ", Fecha Nacimiento: " + fechaNacimiento);
             }
-
-            System.out.println("------------------------------------------------------------------------------");
-            System.out.println("ID Autor: " + id_autor + ", Nombre: " + nombre + ", Apellido 1: " + apellido1 + 
-                                ", Apellido 2: " + apellido2 + ", Nacionalidad: " + nacionalidad + 
-                                ", Fecha Nacimiento: " + fechaNacimiento);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
 
     public static boolean deleteAutor(Connection conn, int id){
         Statement st = null;
