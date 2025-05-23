@@ -74,4 +74,36 @@ public class Io {
             }
         }
     }
+
+    // Limpiar pantalla para win o linux. 
+    public static void limpiarPantalla() {
+        try {
+            String os = System.getProperty("os.name");
+            
+            if (os.contains("Windows")) {
+                ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "cls");
+                pb.inheritIO().start().waitFor();
+            } else {
+                ProcessBuilder pb = new ProcessBuilder("clear");
+                pb.inheritIO().start().waitFor();
+            }
+        } catch (Exception error) {
+            // si no funciona imprimir muchas lineas vacias
+            int i = 0;
+            while (i < 25) {
+                System.out.println("");
+                i++;
+            }
+        }
+    }
+
+    public static void esperarEnter() {
+        System.out.print("Presiona Enter para continuar...");
+        try {
+            System.in.read();
+            scanner.nextLine();
+            limpiarPantalla();
+        } catch (Exception error) {
+        }
+    }
 }

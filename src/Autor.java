@@ -185,6 +185,7 @@ public class Autor {
         int opcion = 0;
 
         do {
+            Io.limpiarPantalla();
             System.out.println("Menu de autor:");
             System.out.println("1. Ver lista de autores");
             System.out.println("2. Añadir un autor");
@@ -192,6 +193,7 @@ public class Autor {
             System.out.println("4. Volver al menú principal");
             System.out.print("Selecciona una opción: ");
             opcion = Io.leerNumero();
+            Io.limpiarPantalla();
 
             switch (opcion) {
                 case 1:

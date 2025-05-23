@@ -51,6 +51,7 @@ public class Ejemplar {
             System.out.println("5. Salir");
             System.out.print("Selecciona una opción: ");
             opcion = Io.leerNumero();
+            Io.limpiarPantalla();
 
             switch (opcion) {
                 case 1:
@@ -237,8 +238,8 @@ public class Ejemplar {
         System.out.println("Introduce el ID del ejemplar: ");
         int id_ejemplar = Io.leerNumero();
         
-        System.out.println("Introduce el nuevo estado (disponible, prestado, retrasado, reparacion): ");
-        String nuevoEstado = Io.leerTexto();
+        System.out.println("Introduce el nuevo estado (Disponible, Prestado, Retrasado, Reparacion): ");
+        String nuevoEstado = Io.leerTexto().toLowerCase();
         
         // Comprobar si es un estado válido
         if (nuevoEstado == null || nuevoEstado.isEmpty() || 

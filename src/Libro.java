@@ -72,6 +72,7 @@ public class Libro {
             System.out.println("5. Salir");
             System.out.print("Selecciona una opción: ");
             opcion = Io.leerNumero();
+            Io.limpiarPantalla();
 
             switch (opcion) {
                 case 1:

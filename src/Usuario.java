@@ -197,6 +197,7 @@ public class Usuario {
         try {
             st = conn.createStatement();
             rs = st.executeQuery(sel);
+            Io.limpiarPantalla();
             
             if (rs.next()) {
                 // Mostrar información del usuario que se va a eliminar
@@ -296,6 +297,7 @@ public class Usuario {
             System.out.println("4. Volver al menú principal");
             System.out.print("Selecciona una opción: ");
             opcion = Io.leerNumero();
+            Io.limpiarPantalla();
 
             switch (opcion) {
                 case 1:

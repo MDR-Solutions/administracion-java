@@ -156,6 +156,7 @@ public class Prestamo {
             System.out.println("4. Salir");
             System.out.print("Selecciona una opción: ");
             opcion = Io.leerNumero();
+            Io.limpiarPantalla();
 
             switch (opcion) {
                 case 1:

@@ -6,10 +6,12 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) {
         // Obtenemos la conexión a la BBDD
+        Io.limpiarPantalla();
         Connection conn = ConexionDB.getConexion();
 
         // Verificamos que tenemos conexión
         if (conn != null) {
+            Io.limpiarPantalla();
             boolean activo = true;
             while (activo) {
                 System.out.println("Menú:");
@@ -31,6 +33,7 @@ public class Main {
                         stmt.setString(1, dni);
                         stmt.setString(2, contrasena);
                         ResultSet rs = stmt.executeQuery();
+                        Io.limpiarPantalla();
 
                         if (rs.next()) {
                             System.out.println("Login exitoso. Bienvenido, " + rs.getString("USUNOM") + "!");
@@ -46,6 +49,7 @@ public class Main {
                                 System.out.println("0. Cerrar sesión");
                                 System.out.print("Elige una opción: ");
                                 int subOpcion = Io.leerNumero();
+                                Io.limpiarPantalla();
 
                                 if (subOpcion == 0) {
                                     System.out.println("Cerrando sesión...");
